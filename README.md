@@ -1,7 +1,83 @@
-# instagram-script-unsubscribe-all
+# instagram-script-unfollow-everyone
 
-Не работает. Instagram не даёт отписаться от множества людей единовременно. Разрешает где-то по 15 человек в час, после нескольких массовых чисток в ~50 человек. Поэтому нет смысла в скрипте.
+Втавьте код, который ниже, в консоль браузера и нажмите Enter
+```javascript
+Element.prototype.parents = function(selector) {
+  var elements = [];
+  var elem = this;
+  var ishaveselector = selector !== undefined;
+ 
+  while ((elem = elem.parentElement) !== null) {
+    if (elem.nodeType !== Node.ELEMENT_NODE) {
+      continue;
+    }
+ 
+    if (!ishaveselector || elem.matches(selector)) {
+      elements.push(elem);
+    }
+  }
+ 
+  return elements;
+};
 
+
+console.info('Открыли список подписок');
+document.querySelector('a[href*="following"]').dispatchEvent(
+  new MouseEvent('click', {bubbles: true, cancelable: true})
+);
+
+
+setTimeout(function() {
+  var timeout = 45; // seconds
+
+  console.warn(
+    'Скрипт начал работу: первая и последующие отписки будут через '
+    + timeout + ' секунд'
+  );
+
+  function clickToButtonUnsubscribe(selectorButtons, $ulWrapper, iteration) {
+    iteration = typeof(iteration) === 'number' ? iteration : 1;
+
+    var $button = document.querySelector(selectorButtons);
+
+    if ($button) {
+      setTimeout(function() {
+        $button.dispatchEvent(
+          new MouseEvent('click', {bubbles: true, cancelable: true})
+        );
+
+        var needScroll = iteration > 2;
+
+        if (needScroll) {
+          $ulWrapper.scrollTop = (
+            $ulWrapper.scrollTop + $button.parents('li')[0].offsetHeight
+          );
+        }
+
+        console.info(
+          'Кликнул по кнопке №' + iteration + (
+            needScroll ? ' и проскролил список' : ''
+          ),
+          {
+            datetime: new Date(),
+            $button,
+            $ulWrapper
+          }
+        );
+        
+        clickToButtonUnsubscribe(selectorButtons, $ulWrapper, iteration + 1);
+      }, timeout * 1000);
+    } else {
+      console.warn('Скрипт завершил работу: нет кнопоки для отписки');
+    }
+  }
+
+  clickToButtonUnsubscribe(
+    'button._qv64e._t78yp._4tgw8._njrw0', // selector of buttons for unsubscribe
+    document.querySelector('div._gs38e') // selector for wrapper of ul-tag
+  );
+}, 2000);
+```
 
 ## Кнопка врунишка
 Обратите внимание, что если кнопка реагирует — будто вы отписались, возможно это не так. Если при отписке в логах вы видете 403 ошибку, значит Инстаграм не одобрил отписку.
