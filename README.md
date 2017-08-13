@@ -1,6 +1,9 @@
 # instagram-script-unfollow-everyone
 
-Скрипт отпысывает по одному человеку каждые 45 секунд. Если сделать «быстрее», Истаграм будет блокировать отписки. Чтобы понять, когда сработала блокировка, читайте ниже [про «кнопку врунишку»](#Кнопка-врунишка).
+Скрипт отпысывает по одному человеку каждые 45 секунд. Если сделать «быстрее», Истаграм будет блокировать отписки. Чтобы понять, что блокировка сработала, прочтите [про «кнопку врунишку»](#Кнопка-врунишка).
+
+
+## Инструкция
 
 Чтобы отписаться от всех в Инстаграме:
 1. Откройте свою страничку в Инстаграме (http://instagram.com/sotnikov.link)
@@ -8,6 +11,7 @@
 3. Скопируйте [скрипт](#Скрипт)
 4. Вставьте скопированный скрипт в открытую Console и нажмите Enter
 5. Ожидайте результат в Console `Скрипт завершил работу: нет кнопоки для отписки`
+6. Проверьте результат
 
 
 ## Скрипт
@@ -57,18 +61,12 @@ setTimeout(function() {
           new MouseEvent('click', {bubbles: true, cancelable: true})
         );
 
-        var needScroll = iteration > 2;
-
-        if (needScroll) {
-          $ulWrapper.scrollTop = (
-            $ulWrapper.scrollTop + $button.parents('li')[0].offsetHeight
-          );
-        }
+        var tmpScrollTop = $ulWrapper.scrollTop;
+        $ulWrapper.scrollTop = $ulWrapper.scrollTop + $ulWrapper.scrollHeight;
+        setTimeout(function() { $ulWrapper.scrollTop = tmpScrollTop; }, 100);
 
         console.info(
-          'Кликнул по кнопке №' + iteration + (
-            needScroll ? ' и проскролил список' : ''
-          ),
+          'Кликнул по кнопке №' + iteration + ' и проскролил список',
           {
             datetime: new Date(),
             $button,
@@ -94,4 +92,4 @@ setTimeout(function() {
 ## Кнопка врунишка
 Обратите внимание, что если кнопка реагирует — будто вы отписались, возможно это не так. Если при отписке в логах вы видете 403 ошибку, значит Инстаграм не одобрил отписку.
 
-![image](https://user-images.githubusercontent.com/10273334/29161245-2ef7050a-7dbe-11e7-9f54-3da774175d3f.png)
+![image](https://user-images.githubusercontent.com/10273334/29251465-dc23d2fc-805d-11e7-9ae3-8ba12077c0fa.png)
